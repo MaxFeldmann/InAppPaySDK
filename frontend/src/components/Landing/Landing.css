@@ -1,0 +1,70 @@
+/* Full-screen centered layout */
+.landing-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to right, #667eea, #764ba2);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card styling */
+.form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-card h1 {
+  margin-bottom: 10px;
+  font-size: 28px;
+  color: #333;
+}
+
+.form-card p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* Input styling */
+form input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+
+form input:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+/* Button styling */
+form button {
+  width: 100%;
+  padding: 12px 16px;
+  background: #667eea;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+form button:hover {
+  background: #5a67d8;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
+}
