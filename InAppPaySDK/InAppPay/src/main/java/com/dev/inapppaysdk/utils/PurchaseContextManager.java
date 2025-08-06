@@ -65,6 +65,14 @@ public class PurchaseContextManager {
         }
     }
 
+    /**
+     * Gets the current item data
+     * @return Map containing item data or null if not set
+     */
+    public Map<String, Object> getItemData() {
+        return currentItemData;
+    }
+
     /** Clears all current purchase context information. */
     public void reset() {
         currentItemKey = null;
@@ -84,10 +92,6 @@ public class PurchaseContextManager {
         return currentItemKey != null && currentItemType != null && currentItemData != null;
     }
 
-    // ===================
-    // Getters
-    // ===================
-
     public String getCurrentItemKey() { return currentItemKey; }
     public PurchaseCallback getCurrentPurchaseCallback() { return currentPurchaseCallback; }
     public String getCurrentItemType() { return currentItemType; }
@@ -95,9 +99,6 @@ public class PurchaseContextManager {
     public String getPrice() { return price; }
     public String getLabel() { return label; }
 
-    // ===================
-    // Setters (Manual overrides)
-    // ===================
     public void setPrice(String price) { this.price = price; }
     public void setLabel(String label) { this.label = label; }
 }
