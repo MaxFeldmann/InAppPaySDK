@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">InAppPaySDK</string>
+    <string name="loading_str">Fetching from server...</string>
 </resources>

@@ -1,0 +1,498 @@
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header styles */
+.header {
+  background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
+  color: white;
+  padding: 60px 40px;
+  margin-bottom: 32px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.header p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+/* Base URL styles */
+.base-url {
+  background-color: #1f2937;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 1.125rem;
+  text-align: center;
+}
+
+/* Card styles */
+.card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-small {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Table of Contents */
+.toc h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #2563eb;
+}
+
+.toc ul {
+  list-style: none;
+  padding: 0;
+}
+
+.toc li {
+  margin-bottom: 8px;
+}
+
+.toc-link {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.toc-link:hover {
+  color: #2563eb;
+  background-color: #f3f4f6;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+/* Alert/Note styles */
+.alert {
+  background-color: #fef3cd;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+  margin-top: 16px;
+}
+
+.alert strong {
+  color: #92400e;
+}
+
+/* Endpoint styles */
+.endpoint {
+  border-left: 4px solid #2563eb;
+  padding-left: 20px;
+  margin: 32px 0;
+}
+
+.endpoint-title {
+  color: #2563eb;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.endpoint-method {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.method-badge {
+  background-color: #059669;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.endpoint-url {
+  font-family: 'Courier New', monospace;
+  background-color: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.endpoint-description {
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+/* Tab styles */
+.tab-container {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.tab-button {
+  padding: 8px 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  margin-right: 4px;
+  transition: all 0.2s ease;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+  background-color: #2563eb;
+  color: white;
+  border-bottom: 2px solid #2563eb;
+}
+
+.tab-button:hover:not(.active) {
+  background-color: #e5e7eb;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.tab-content h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Table styles */
+.params-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.params-table th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.params-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.params-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.param-name {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+.param-required {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.param-optional {
+  color: #6b7280;
+}
+
+/* Code block styles */
+.code-block {
+  background-color: #1f2937;
+  color: #f3f4f6;
+  padding: 20px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.code-block pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Response example styles */
+.response-example {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.response-example.success {
+  border-left: 4px solid #059669;
+}
+
+.response-example.error {
+  border-left: 4px solid #dc2626;
+}
+
+.response-example strong {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* Error handling styles */
+.error-section {
+  margin-top: 32px;
+}
+
+.error-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.error-card {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.error-400 {
+  background-color: #fef2f2;
+  border-left-color: #dc2626;
+}
+
+.error-400 h4 {
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.error-400 p {
+  color: #b91c1c;
+}
+
+.error-401 {
+  background-color: #fefce8;
+  border-left-color: #eab308;
+}
+
+.error-401 h4 {
+  color: #a16207;
+  font-weight: 600;
+}
+
+.error-401 p {
+  color: #ca8a04;
+}
+
+.error-403 {
+  background-color: #faf5ff;
+  border-left-color: #9333ea;
+}
+
+.error-403 h4 {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.error-403 p {
+  color: #8b5cf6;
+}
+
+.error-500 {
+  background-color: #f9fafb;
+  border-left-color: #6b7280;
+}
+
+.error-500 h4 {
+  color: #374151;
+  font-weight: 600;
+}
+
+.error-500 p {
+  color: #4b5563;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+
+  .header {
+    padding: 40px 20px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .tab-container {
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    margin-bottom: 4px;
+  }
+
+  .params-table {
+    font-size: 0.875rem;
+  }
+
+  .params-table th,
+  .params-table td {
+    padding: 8px;
+  }
+}
+
+.custom-errors-details {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.custom-errors-details[open] .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.custom-errors-details summary.section-header {
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-arrow {
+  font-size: 14px;
+  color: #666;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.custom-error-body {
+  margin-top: 16px;
+}
+
+.custom-error-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 12px;
+}
+
+.custom-error-list li {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: #f4f4f4;
+  border-radius: 6px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: #222;
+}
+
+.custom-error-list code {
+  background: #ffefc0;
+  color: #c65d00;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Custom error code cards */
+.error-card.error-custom {
+  background-color: #f9fafb;
+  border-left: 4px solid #2563eb;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+.error-card.error-custom h4 {
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.error-card.error-custom p {
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.card code {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+}

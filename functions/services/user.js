@@ -42,7 +42,6 @@ const {getUserRef} = require("../utils/database");
 async function updateUserPurchaseHistory(projectName, userId, productId,
     productType, userCountry, transactionId) {
   try {
-    // Input validation
     if (!projectName || !userId || !productId ||
         !productType || !transactionId || !userCountry) {
       throw new
@@ -60,10 +59,8 @@ async function updateUserPurchaseHistory(projectName, userId, productId,
       date: timestamp,
     };
 
-    // Use transaction for atomic update
     await userRef.transaction((currentData) => {
       if (currentData === null) {
-        // Create new user document
         return {
           userId,
           purchaseHistory: [purchaseEntry],
@@ -72,7 +69,6 @@ async function updateUserPurchaseHistory(projectName, userId, productId,
           updatedAt: timestamp,
         };
       } else {
-        // Update existing user document
         const currentHistory = currentData.purchaseHistory || [];
         return {
           ...currentData,
@@ -84,7 +80,6 @@ async function updateUserPurchaseHistory(projectName, userId, productId,
     });
   } catch (error) {
     console.error("Error updating user purchase history:", error);
-    // Don't throw error as this is not critical for the purchase flow
   }
 }
 

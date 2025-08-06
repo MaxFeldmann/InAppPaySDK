@@ -16,11 +16,9 @@ exports.addProduct = functions.https.onRequest((req, res) => {
     securityMiddleware(req, res, async () => {
       try {
         if (!validateRequest(req, res, "addProduct")) return;
-
         const {projectName, name, type, price, description,
           frequency, recurring} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendErrorResponse(res,
@@ -29,16 +27,26 @@ exports.addProduct = functions.https.onRequest((req, res) => {
               404);
         }
 
-        const parsedPrice = parseInt(price, 10);
+        const finalProductId = name;
 
-        // Validation
+        const productsRef = getProductsRef(projectName);
+        const productRef = productsRef.child(finalProductId);
+        const existingProduct = await productRef.once("value");
+
+        if (existingProduct.exists()) {
+          return sendErrorResponse(res,
+              "Product with this ID already exists",
+              "PRODUCT_EXISTS",
+              400);
+        }
+
+        const parsedPrice = parseInt(price, 10);
         if (isNaN(parsedPrice) || parsedPrice <= 0) {
           return sendErrorResponse(res,
               "Price must be a positive number greater than 0",
               "INVALID_PRICE",
               400);
         }
-
         if (!validateProductType(type)) {
           return sendErrorResponse(res,
               "Invalid product type",
@@ -48,12 +56,13 @@ exports.addProduct = functions.https.onRequest((req, res) => {
 
         const timestamp = admin.database.ServerValue.TIMESTAMP;
         const newProduct = {
+          productId: finalProductId,
           name,
           type,
           price: parsedPrice,
           description: description || "",
           purchases: 0,
-          status: "inactive", // Default status is inactive
+          status: "inactive",
           createdAt: timestamp,
           updatedAt: timestamp,
           ...(type === "subscription" && {
@@ -62,11 +71,11 @@ exports.addProduct = functions.https.onRequest((req, res) => {
           }),
         };
 
-        const productRef = getProductsRef(projectName).push();
         await productRef.set(newProduct);
 
         sendSuccessResponse(res, "Product added successfully", {
-          productId: productRef.key,
+          productId: finalProductId,
+          firebaseKey: finalProductId,
           ...newProduct,
         }, 201);
       } catch (error) {
@@ -85,7 +94,6 @@ exports.updateProduct = functions.https.onRequest((req, res) => {
 
         const {projectName, productId, updates} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendErrorResponse(res,
@@ -101,7 +109,6 @@ exports.updateProduct = functions.https.onRequest((req, res) => {
               400);
         }
 
-        // Validate product exists
         const productValidation = await validateProductExists(projectName,
             productId);
         if (!productValidation.exists) {
@@ -111,7 +118,6 @@ exports.updateProduct = functions.https.onRequest((req, res) => {
               404);
         }
 
-        // Use transaction for atomic update
         const productRef = getProductRef(projectName, productId);
         await productRef.transaction((currentData) => {
           if (currentData) {
@@ -141,7 +147,6 @@ exports.deleteProduct = functions.https.onRequest((req, res) => {
 
         const {projectName, productId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendErrorResponse(res,
@@ -150,7 +155,6 @@ exports.deleteProduct = functions.https.onRequest((req, res) => {
               404);
         }
 
-        // Validate product exists
         const productValidation = await validateProductExists(projectName,
             productId);
         if (!productValidation.exists) {
@@ -180,13 +184,11 @@ exports.getProducts = functions.https.onRequest((req, res) => {
 
         const {projectName} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
         }
 
-        // Get all products for the project
         const productsRef = getProductsRef(projectName);
         const snapshot = await productsRef.once("value");
 

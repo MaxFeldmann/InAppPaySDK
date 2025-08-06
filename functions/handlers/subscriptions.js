@@ -17,13 +17,11 @@ exports.checkUserSubscribed = functions.https.onRequest((req, res) => {
 
         const {projectName, productId, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
         }
 
-        // Check if user has active subscription
         const subscriptionRef = getSubscriptionsRef(projectName);
         const subscriptionQuery = await subscriptionRef.orderByChild("userId").
             equalTo(userId).once("value");
@@ -47,12 +45,10 @@ exports.checkUserSubscribed = functions.https.onRequest((req, res) => {
           });
         }
 
-        // Check if subscription is still valid (not expired)
         const now = Date.now();
         const endDate = userSubscription.endDate;
 
         if (endDate < now) {
-        // Subscription expired, update status using transaction
           const subscriptionKey = Object.keys(subscriptions).find((key) =>
             subscriptions[key].productId === productId &&
                   subscriptions[key].status === "active",
@@ -114,7 +110,6 @@ exports.getSubscriptions = functions.https.onRequest((req, res) => {
 
         const {projectName, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);

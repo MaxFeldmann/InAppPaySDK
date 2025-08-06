@@ -11,7 +11,7 @@ const maskCardNumber = (cardNumber) => {
 
 /**
  * @return {Promise<void>} Promise that resolves when update
- * is complete Processes payment for different payment
+ * is complete. Processes payment for different payment
  * methods with comprehensive validation
  * @async
  * @function processPayment
@@ -82,7 +82,6 @@ async function processPayment(paymentMethod, cardData, paypalData,
         };
       }
 
-      // Validate expiry date format (MM/YY)
       if (!/^\d{2}\/\d{2}$/.test(cardData.expiry)) {
         return {
           success: false,
@@ -91,7 +90,31 @@ async function processPayment(paymentMethod, cardData, paypalData,
         };
       }
 
-      // Validate CVV
+      const [month, year] = cardData.expiry.split("/");
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear() % 100;
+      const currentMonth = currentDate.getMonth() + 1;
+
+      const cardYear = parseInt(year, 10);
+      const cardMonth = parseInt(month, 10);
+
+      if (cardMonth < 1 || cardMonth > 12) {
+        return {
+          success: false,
+          error: "Invalid expiry month",
+          errorCode: "INVALID_EXPIRY_MONTH",
+        };
+      }
+
+      if (cardYear < currentYear || (cardYear === currentYear &&
+         cardMonth < currentMonth)) {
+        return {
+          success: false,
+          error: "Card has expired",
+          errorCode: "CARD_EXPIRED",
+        };
+      }
+
       if (!/^\d{3,4}$/.test(cardData.cvv)) {
         return {
           success: false,
@@ -99,9 +122,6 @@ async function processPayment(paymentMethod, cardData, paypalData,
           errorCode: "INVALID_CVV",
         };
       }
-
-      // Simulate processing delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       return {
         success: true,
@@ -118,7 +138,6 @@ async function processPayment(paymentMethod, cardData, paypalData,
         };
       }
 
-      // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(paypalData.email)) {
         return {
@@ -151,6 +170,74 @@ async function processPayment(paymentMethod, cardData, paypalData,
       error: "Payment processing failed",
       errorCode: "PAYMENT_PROCESSING_ERROR",
     };
+  }
+}
+
+/**
+ * Cancels/voids a payment transaction.
+ *
+ * This function handles the cancellation of payment transactions
+ * across different payment methods. It's typically called when
+ * database operations fail after a successful payment to maintain
+ * transaction consistency.
+ *
+ * @async
+ * @function cancelPayment
+ * @param {string} paymentId - The unique identifier of the payment to cancel.
+ * @param {string} paymentMethod - The payment method used.
+ * @return {Promise<Object>} Result object.
+ * @return {boolean} returns.success - Whether the cancellation was successful.
+ * @return {string} [returns.error] - Error message if cancellation failed.
+ *
+ * @example
+ * ```js
+ * const result = await cancelPayment('pi_1234567890', 'card');
+ * if (result.success) {
+ *   console.log('Payment cancelled successfully');
+ * } else {
+ *   console.error('Cancellation failed:', result.error);
+ * }
+ * ```
+ *
+ * @example
+ * ```js
+ * const result = await cancelPayment('PAY-1234567890', 'paypal');
+ * ```
+ *
+ * @throws {Error} May throw errors from payment processor APIs.
+ */
+async function cancelPayment(paymentId, paymentMethod) {
+  try {
+    if (!paymentId) {
+      console.log("No payment ID provided for cancellation");
+      return {success: false, error: "No payment ID"};
+    }
+
+    console.log(`Cancelling payment: ${paymentId} via ${paymentMethod}`);
+
+    switch (paymentMethod) {
+      case "card":
+        // Simulate card payment cancellation
+        // In a real implementation, this would cancel the payment
+        console.log(`Voiding card payment ${paymentId}`);
+        break;
+
+      case "paypal":
+        // Simulate PayPal payment cancellation
+        // In a real implementation, this would call PayPal's void/cancel API
+        console.log(`Voiding PayPal payment ${paymentId}`);
+        break;
+
+      default:
+        console.log(`Unknown payment method for cancel: ${paymentMethod}`);
+        return {success: false, error: "Unknown payment method"};
+    }
+
+    console.log(`Payment ${paymentId} cancelled successfully`);
+    return {success: true};
+  } catch (error) {
+    console.error(`Failed to cancel payment ${paymentId}:`, error);
+    return {success: false, error: error.message};
   }
 }
 
@@ -188,7 +275,7 @@ function calculateEndDate(frequency) {
     case "monthly":
       return now + (30 * oneDay);
     case "yearly":
-      return now + (365 * oneDay); // Note: Doesn't account for leap years
+      return now + (365 * oneDay);
     case "weekly":
       return now + (7 * oneDay);
     default:
@@ -199,4 +286,5 @@ function calculateEndDate(frequency) {
 module.exports = {generateTransactionId,
   maskCardNumber,
   processPayment,
-  calculateEndDate};
+  calculateEndDate,
+  cancelPayment};

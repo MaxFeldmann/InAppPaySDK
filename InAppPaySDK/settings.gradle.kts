@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "InAppPaySDK"
 include(":InAppPay")
+include(":demoapp")

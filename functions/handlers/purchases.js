@@ -13,14 +13,15 @@ const {sendSuccessResponse,
   handleError} = require("../utils/response");
 const {getPurchasesRef,
   getSubscriptionsRef,
-  getProductRef} = require("../utils/database");
+  getProjectRef} = require("../utils/database");
 const {generateTransactionId,
   processPayment,
   maskCardNumber,
-  calculateEndDate} = require("../services/payment");
+  calculateEndDate,
+  cancelPayment} = require("../services/payment");
 const updateUserPurchaseHistory = require("../services/user");
 
-// Process Purchase with unified atomic transaction
+// Process Purchase with payment first
 exports.processPurchase = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     securityMiddleware(req, res, async () => {
@@ -30,7 +31,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
         const {projectName, userId, productId, paymentMethod,
           cardData, paypalData} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendErrorResponse(res,
@@ -39,7 +39,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
               404);
         }
 
-        // Validate product exists
         const productValidation = await validateProductExists(projectName,
             productId);
         if (!productValidation.exists) {
@@ -51,7 +50,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
 
         const actualProductData = productValidation.data;
 
-        // Double-check product is active
         if (actualProductData.status !== "active") {
           return sendErrorResponse(res,
               "Product is not available for purchase",
@@ -59,7 +57,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
               400);
         }
 
-        // Validate payment data
         if (paymentMethod === "card" && !cardData) {
           return sendErrorResponse(res,
               "Card data required for card payments",
@@ -81,20 +78,24 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
               400);
         }
 
-        // Get user's country
         const userCountry = (req && req.country) ? req.country : "US";
 
-        // Generate transaction ID upfront
         const transactionId = generateTransactionId();
 
-        // Single atomic transaction for purchase validation and creation
+        const paymentResult = await processPayment(paymentMethod, cardData,
+            paypalData, actualProductData, userCountry);
+
+        if (!paymentResult.success) {
+          return sendErrorResponse(res,
+              "Transaction failed: " + paymentResult.error,
+              paymentResult.errorCode,
+              400);
+        }
+
         try {
-          // Get references using utility functions
           const purchasesRef = getPurchasesRef(projectName);
           const subscriptionsRef = getSubscriptionsRef(projectName);
-
-          // Use the parent ref for the atomic transaction
-          const projectRef = getProductRef(projectName);
+          const projectRef = getProjectRef(projectName);
 
           const transactionResult = await projectRef.transaction(
               (projectData) => {
@@ -102,13 +103,10 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                   projectData = {};
                 }
 
-                // Initialize collections if they don't exist
                 if (!projectData.purchases) projectData.purchases = {};
                 if (!projectData.subscriptions) projectData.subscriptions = {};
 
-                // Check for existing purchases based on product type
                 if (actualProductData.type === "one-time") {
-                  // Check if user already has this one-time item
                   const existingPurchase = Object.values(projectData.purchases)
                       .find((purchase) =>
                         purchase.userId === userId &&
@@ -117,11 +115,9 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                       );
 
                   if (existingPurchase) {
-                    // Signal abortion by returning null
                     return null;
                   }
                 } else if (actualProductData.type === "subscription") {
-                  // Check if user already has active subscription
                   const existingSubscription = Object.values(projectData
                       .subscriptions)
                       .find((sub) =>
@@ -131,7 +127,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                       );
 
                   if (existingSubscription) {
-                    // Signal abortion by returning null
                     return null;
                   }
                 }
@@ -139,7 +134,6 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                 const timestamp = admin.database.ServerValue.TIMESTAMP;
                 const currentTime = new Date();
 
-                // Prepare base purchase data
                 const basePurchaseData = {
                   userId,
                   productId,
@@ -152,11 +146,11 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                   country: userCountry,
                   purchaseDate: currentTime.toISOString(),
                   purchaseTimestamp: timestamp,
+                  paymentId: paymentResult.paymentId,
                   createdAt: timestamp,
                   updatedAt: timestamp,
                 };
 
-                // Add payment-specific data
                 if (paymentMethod === "card") {
                   basePurchaseData.cardLastFour = maskCardNumber(cardData
                       .cardNumber);
@@ -165,11 +159,9 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                   basePurchaseData.paypalEmail = paypalData.email;
                 }
 
-                // Create purchase record using the utility function's push key
                 const purchaseKey = purchasesRef.push().key;
                 projectData.purchases[purchaseKey] = basePurchaseData;
 
-                // Create subscription record if it's a subscription
                 if (actualProductData.type === "subscription") {
                   const subscriptionData = {
                     userId,
@@ -194,9 +186,11 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
                 return projectData;
               });
 
-          // Check if transaction was aborted
+          // Check if transaction was aborted due to existing purchase
           if (!transactionResult.committed ||
             transactionResult.snapshot.val() === null) {
+            await cancelPayment(paymentResult.paymentId, paymentMethod);
+
             const errorMessage = actualProductData.type === "one-time" ?
               "Product already purchased" :
               "User already has active subscription";
@@ -206,58 +200,36 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
 
             return sendErrorResponse(res, errorMessage, errorCode, 400);
           }
+
+          await updateUserPurchaseHistory(projectName,
+              userId,
+              productId,
+              actualProductData.type,
+              userCountry,
+              transactionId);
+
+          const currentTime = new Date();
+          sendSuccessResponse(res, "Purchase completed successfully", {
+            transactionId,
+            productId,
+            productType: actualProductData.type,
+            amount: actualProductData.price,
+            currency: "USD",
+            paymentMethod,
+            status: "completed",
+            purchaseDate: currentTime.toISOString(),
+            country: userCountry,
+            paymentId: paymentResult.paymentId,
+          });
         } catch (error) {
+          // Cancel the payment if database operations fail
+          await cancelPayment(paymentResult.paymentId, paymentMethod);
+
           return sendErrorResponse(res,
-              "Purchase validation failed",
-              "VALIDATION_ERROR",
+              "Transaction failed: Database error after payment processed",
+              "DATABASE_ERROR",
               500);
         }
-
-        // Process payment after successful validation
-        const paymentResult = await processPayment(paymentMethod, cardData,
-            paypalData, actualProductData, userCountry);
-
-        if (!paymentResult.success) {
-          // TODO: Implement rollback mechanism for failed payments
-          return sendErrorResponse(res,
-              paymentResult.error,
-              paymentResult.errorCode,
-              400);
-        }
-
-        // Update payment ID in the purchase record
-        await getPurchasesRef(projectName)
-            .orderByChild("transactionId")
-            .equalTo(transactionId)
-            .once("value")
-            .then((snapshot) => {
-              if (snapshot.exists()) {
-                const purchaseKey = Object.keys(snapshot.val())[0];
-                return getPurchasesRef(projectName).child(purchaseKey)
-                    .update({paymentId: paymentResult.paymentId});
-              }
-            });
-
-        // Update user's purchase history
-        await updateUserPurchaseHistory(projectName,
-            userId,
-            productId,
-            actualProductData.type,
-            userCountry,
-            transactionId);
-
-        const currentTime = new Date();
-        sendSuccessResponse(res, "Purchase completed successfully", {
-          transactionId,
-          productId,
-          productType: actualProductData.type,
-          amount: actualProductData.price,
-          currency: "USD",
-          paymentMethod,
-          status: "completed",
-          purchaseDate: currentTime.toISOString(),
-          country: userCountry,
-        });
       } catch (error) {
         handleError(res, error, "Error processing purchase");
       }
@@ -265,7 +237,7 @@ exports.processPurchase = functions.https.onRequest((req, res) => {
   });
 });
 
-// Check User Purchased
+// Check if user purchased
 exports.checkUserPurchased = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     securityMiddleware(req, res, async () => {
@@ -276,13 +248,11 @@ exports.checkUserPurchased = functions.https.onRequest((req, res) => {
 
         const {projectName, productId, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
         }
 
-        // Check if user has purchased this product
         const purchaseRef = getPurchasesRef(projectName);
         const purchaseQuery = await purchaseRef.orderByChild("userId").
             equalTo(userId).once("value");
@@ -342,7 +312,6 @@ exports.getPurchases = functions.https.onRequest((req, res) => {
 
         const {projectName, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
@@ -351,7 +320,6 @@ exports.getPurchases = functions.https.onRequest((req, res) => {
         const purchasesRef = getPurchasesRef(projectName);
         let query = purchasesRef;
 
-        // If userId is provided, filter by userId
         if (userId) {
           query = purchasesRef.orderByChild("userId").equalTo(userId);
         }
@@ -379,7 +347,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
 
         const {projectName, productId, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendErrorResponse(res,
@@ -388,7 +355,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
               404);
         }
 
-        // Validate product exists and get product data
         const productValidation = await validateProductExists(projectName,
             productId);
         if (!productValidation.exists) {
@@ -400,7 +366,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
 
         const productData = productValidation.data;
 
-        // Check if product is active
         if (productData.status !== "active") {
           return sendErrorResponse(res,
               "Product is not available for purchase",
@@ -408,7 +373,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
               400);
         }
 
-        // For one-time items, check if user already owns it
         if (productData.type === "one-time") {
           const purchaseRef = getPurchasesRef(projectName);
           const purchaseQuery = await purchaseRef.orderByChild("userId").
@@ -430,7 +394,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
           }
         }
 
-        // For subscriptions, check if user has active subscription
         if (productData.type === "subscription") {
           const subscriptionRef = getSubscriptionsRef(projectName);
           const subscriptionQuery = await subscriptionRef.
@@ -452,7 +415,6 @@ exports.validateItemForPurchase = functions.https.onRequest((req, res) => {
           }
         }
 
-        // Return product data for purchase
         sendSuccessResponse(res, "Product validation successful", {
           id: productId,
           type: productData.type,

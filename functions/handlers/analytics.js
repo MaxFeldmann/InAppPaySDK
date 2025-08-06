@@ -17,13 +17,11 @@ exports.getUserSummary = functions.https.onRequest((req, res) => {
 
         const {projectName, userId} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
         }
 
-        // Get user's purchases and subscriptions concurrently
         const [purchaseQuery, subscriptionQuery] = await Promise.all([
           getPurchasesRef(projectName).orderByChild("userId").
               equalTo(userId).once("value"),
@@ -68,13 +66,11 @@ exports.getProjectAnalytics = functions.https.onRequest((req, res) => {
 
         const {projectName, startDate, endDate} = req.body;
 
-        // Validate project exists
         const projectExists = await validateProjectExists(projectName);
         if (!projectExists) {
           return sendResponse(res, false, "Project not found", null, 404);
         }
 
-        // Get all data concurrently
         const [purchaseSnapshot, productSnapshot, subscriptionSnapshot] =
           await Promise.all([getPurchasesRef(projectName).once("value"),
             getProductsRef(projectName).once("value"),
@@ -88,7 +84,6 @@ exports.getProjectAnalytics = functions.https.onRequest((req, res) => {
         const subscriptions = subscriptionSnapshot.exists() ?
           Object.values(subscriptionSnapshot.val()) : [];
 
-        // Filter by date range if provided
         let filteredPurchases = purchases;
         if (startDate && endDate) {
           const start = new Date(startDate).getTime();
@@ -99,7 +94,6 @@ exports.getProjectAnalytics = functions.https.onRequest((req, res) => {
           });
         }
 
-        // Calculate analytics
         const completedPurchases = filteredPurchases.filter((p) =>
           p.status === "completed");
         const totalRevenue = completedPurchases.reduce((sum, purchase) =>
@@ -107,7 +101,6 @@ exports.getProjectAnalytics = functions.https.onRequest((req, res) => {
         const activeSubscriptions = subscriptions.filter((sub) =>
           sub.status === "active");
 
-        // Revenue analytics
         const revenueByCountry = {};
         const revenueByPaymentMethod = {};
         const productRevenue = {};
@@ -168,7 +161,6 @@ exports.initializeProject = functions.https.onRequest((req, res) => {
 
         const {projectName} = req.body;
 
-        // Validate project name doesn't contain invalid characters
         const INVALID_CHARS = /[.#$[\]/]/;
         if (INVALID_CHARS.test(projectName)) {
           return sendResponse(res,
@@ -183,11 +175,9 @@ exports.initializeProject = functions.https.onRequest((req, res) => {
         const timestamp = admin.database.ServerValue.TIMESTAMP;
 
         try {
-        // Use transaction for atomic project initialization
           const transactionResult = await projectRef.
               transaction((currentData) => {
                 if (currentData === null) {
-                  // Create new project
                   return {
                     products: false,
                     purchases: false,
@@ -197,7 +187,6 @@ exports.initializeProject = functions.https.onRequest((req, res) => {
                     updatedAt: timestamp,
                   };
                 }
-                // Project already exists, update timestamp
                 return {
                   ...currentData,
                   updatedAt: timestamp,

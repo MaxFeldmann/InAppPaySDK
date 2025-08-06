@@ -2,7 +2,6 @@ const sendErrorResponse = require("../utils/response");
 
 // Security middleware
 const securityMiddleware = (req, res, next) => {
-  // Add security headers
   res.set("X-Content-Type-Options", "nosniff");
   res.set("X-Frame-Options", "DENY");
   res.set("X-XSS-Protection", "1; mode=block");

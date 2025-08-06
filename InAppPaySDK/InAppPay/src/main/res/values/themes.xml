@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.InAppPaySDK" parent="Base.Theme.InAppPaySDK" />
+
+    <style name="Theme.SDK.Dialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <!-- Dialog customizations -->
+    </style>
 </resources>
