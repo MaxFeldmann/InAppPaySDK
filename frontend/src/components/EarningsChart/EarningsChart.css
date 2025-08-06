@@ -8,6 +8,12 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.chart-header h2 {
+  margin: 0;
+  color: #333;
 }
 
 .controls {
@@ -17,7 +23,16 @@
 }
 
 .controls select {
-  padding: 6px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: #0088FE;
 }
 
 .loading,
@@ -26,10 +41,30 @@
   margin: 20px 0;
   font-weight: bold;
   color: #555;
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.error {
+  background: #fee;
+  color: #d00;
+  border: 1px solid #fcc;
 }
 
 .error button {
   margin-left: 10px;
+  padding: 6px 12px;
+  background: #d00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error button:hover {
+  background: #b00;
 }
 
 .analytics-body {
@@ -40,47 +75,224 @@
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .card {
   flex: 1;
   min-width: 180px;
-  padding: 16px;
+  padding: 20px;
   border-radius: 8px;
-  background: #f2f2f2;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #f2f2f2 0%, #e8e8e8 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
 }
 
 .card h4 {
-  margin: 0 0 8px;
-  font-size: 16px;
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 }
 
 .chart-section {
-  margin-top: 20px;
+  margin-top: 30px;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-section h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.graph-summary {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #0088FE;
+}
+
+.graph-summary p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.graph-summary strong {
+  color: #333;
+  margin-right: 8px;
 }
 
 .purchases {
   margin-top: 30px;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.purchase-list {
-  list-style: none;
-  padding: 0;
+.purchases h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.purchases-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .purchase-item {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.purchase-item > div {
-  margin: 4px 0;
+.purchase-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.purchase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.purchase-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status.completed,
+.status.success,
+.status.paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.failed,
+.status.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status.unknown {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.purchase-details {
+  display: grid;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.detail-row .label {
+  font-weight: 500;
+  color: #666;
+  min-width: 120px;
+}
+
+.detail-row .value {
+  color: #333;
+  text-align: right;
+  flex: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .range-info {
   margin-top: 20px;
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.range-info small {
   font-size: 12px;
   color: #777;
+}
+
+.no-purchases small {
+  display: block;
+  margin-top: 10px;
+  font-weight: normal;
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .controls {
+    margin-top: 15px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .controls select {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .metrics {
+    flex-direction: column;
+  }
+  
+  .card {
+    min-width: 100%;
+  }
+}
+
+.recharts-wrapper {
+  width: 100% !important;
 }
