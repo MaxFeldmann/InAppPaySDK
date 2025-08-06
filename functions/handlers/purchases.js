@@ -21,7 +21,6 @@ const {generateTransactionId,
   cancelPayment} = require("../services/payment");
 const updateUserPurchaseHistory = require("../services/user");
 
-// Process Purchase with payment first
 exports.processPurchase = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     securityMiddleware(req, res, async () => {
