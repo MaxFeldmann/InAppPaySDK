@@ -129,4 +129,5 @@ inapppaysdk/.cxx
 # React environment files
 frontend/.env
 frontend/.env.*
+frontend/build
 

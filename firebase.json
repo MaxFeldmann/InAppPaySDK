@@ -16,11 +16,18 @@
     }
   ],
   "hosting": {
-    "public": "public",
+    "site": "inapppaysdk",
+    "public": "frontend/build",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   },
   "database": {
