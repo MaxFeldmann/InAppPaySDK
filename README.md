@@ -6,11 +6,10 @@ A complete in-app monetization platform for Android apps — built with a modula
 
 - [Overview](#overview)
 - [Features](#key-features)
-- [Screenshots](#screenshots)
-- [Developer Flow](#developer-flow)
-- [Documentation](#documentation)
-- [API & Java Docs](#api--java-docs)
 - [Demo Video](#demo-video)
+- [Developer Flow](#developer-flow)
+- [Screenshots](#screenshots)
+- [Documentation](#documentation)
 - [Tech Stack](#tech-stack)
 
 ## 🔍 Overview
@@ -34,44 +33,12 @@ This project enables Android developers to fully control their in-app purchase f
 
 ---
 
-## 📸 Screenshots
-
-<div align="left">
+## 🎥 Demo Video
   
- ### Home Page
-  <img src="https://i.ibb.co/k24RZVQd/landing.jpg" alt="Home Page" width="600"/>
 
-  <br/><br/>
- ### Earnings Example
-  <img src="https://i.ibb.co/kgBrGfWV/earnings.jpg" alt="Earnings Example" width="600"/>
+[![Watch the Demo](https://i.ibb.co/kg6LKyfB/thumbnail.jpg)](https://youtu.be/A_-fc9HH7cc)
 
-  <br/><br/>
-  ### Earnings Pie Example
-  <img src="https://i.ibb.co/fVL6x9qj/pie.jpg" alt="Earnings Pie Example" width="600"/>
-
-  <br/><br/>
- ### Products Example
-  <img src="https://i.ibb.co/C5Xhq06X/products.jpg" alt="Products Example" width="600"/>
-
-  <br/><br/>
-  ### Purchases Example
-  <img src="https://i.ibb.co/GBKFdMq/purchases.jpg" alt="Purchases Example" width="600"/>
-
-  <br/><br/>
-  ### Purchasing Example
-  <img src="https://i.ibb.co/jkDvCP5V/purchasecard.jpg" alt="Purchasing Example" width="600"/>
-
-  <br/><br/>
-  ### Purchase Input Example
-  <img src="https://i.ibb.co/ymZsNVB1/purchasestart.jpg" alt="Purchase Input Example" width="600"/>
-
-  <br/><br/>
-  ### Purchase Error Example
-  <img src="https://i.ibb.co/pBGCsYbt/purchaseerror.jpg" alt="Purchase Error Example" width="600"/>
-
-  <br/><br/>
-
-</div>
+Click the image above to watch a quick demonstration of how to use the SDK in your app.
 
 ---
 
@@ -136,28 +103,62 @@ This project enables Android developers to fully control their in-app purchase f
 
 ---
 
-📚 Documentation
+## 📸 Screenshots
+
+<div align="left">
+  
+ ### Home Page
+  <img src="https://i.ibb.co/k24RZVQd/landing.jpg" alt="Home Page" width="600"/>
+
+  <br/><br/>
+ ### Earnings Example
+  <img src="https://i.ibb.co/kgBrGfWV/earnings.jpg" alt="Earnings Example" width="600"/>
+
+  <br/><br/>
+  ### Earnings Pie Example
+  <img src="https://i.ibb.co/fVL6x9qj/pie.jpg" alt="Earnings Pie Example" width="600"/>
+
+  <br/><br/>
+ ### Products Example
+  <img src="https://i.ibb.co/C5Xhq06X/products.jpg" alt="Products Example" width="600"/>
+
+  <br/><br/>
+  ### Purchases Example
+  <img src="https://i.ibb.co/GBKFdMq/purchases.jpg" alt="Purchases Example" width="600"/>
+
+  <br/><br/>
+  ### Purchasing Example
+  <img src="https://i.ibb.co/jkDvCP5V/purchasecard.jpg" alt="Purchasing Example" width="600"/>
+
+  <br/><br/>
+  ### Purchase Input Example
+  <img src="https://i.ibb.co/ymZsNVB1/purchasestart.jpg" alt="Purchase Input Example" width="600"/>
+
+  <br/><br/>
+  ### Purchase Error Example
+  <img src="https://i.ibb.co/pBGCsYbt/purchaseerror.jpg" alt="Purchase Error Example" width="600"/>
+
+  <br/><br/>
+
+</div>
+
+---
+
+## 📚 Documentation
 
   - 📘 Java SDK Docs: [Java-doc](https://inapppaysdk.web.app/java-doc)
   
   - 🔌 API Reference: [API-doc](https://inapppaysdk.web.app/doc)
 
----
-
-🎥 Demo Video
-  
-  A demo video will be embedded here soon.
-  <!-- Once ready, will be embeded: ![Demo Video](https://link-to-thumbnail.jpg) [Watch the Demo](https://link-to-video.com) -->
 
 ---
 
-🛠 Tech Stack
+## 🛠 Tech Stack
 
   Mobile SDK: Java (Android)
   
   Backend: Firebase Cloud Functions & Firestore
   
-  Frontend Console: React
+  Frontend Console: React (JavaScript && CSS)
   
-  Payments: Credit Card, PayPal
 
