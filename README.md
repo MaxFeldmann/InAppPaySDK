@@ -161,5 +161,3 @@ This project enables Android developers to fully control their in-app purchase f
   
   Payments: Credit Card, PayPal
 
-The software (ThermoML) is developed independently by Max Feldman and Shahar Zeharia and is licensed under the MIT License.
-
